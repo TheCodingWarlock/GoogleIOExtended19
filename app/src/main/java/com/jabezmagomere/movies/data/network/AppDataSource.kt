@@ -2,10 +2,11 @@ package com.jabezmagomere.movies.data.network
 
 import com.jabezmagomere.movies.data.db.Movie
 import com.jabezmagomere.movies.data.models.Response
+import kotlinx.coroutines.flow.Flow
 
 interface AppDataSource {
-    suspend fun fetchTrendingMoviesThisWeek():retrofit2.Response<Response>
-    suspend fun fetchTrendingMoviesToday(): retrofit2.Response<Response>
-    suspend fun fetchActionMovies(): retrofit2.Response<Response>
-    suspend fun fetchComedyMovies(): retrofit2.Response<Response>
+    suspend fun fetchTrendingMoviesThisWeek():Flow<retrofit2.Response<Response>>
+    suspend fun fetchTrendingMoviesToday(): Flow<retrofit2.Response<Response>>
+    suspend fun fetchActionMovies(): Flow<retrofit2.Response<Response>>
+    suspend fun fetchComedyMovies(): Flow<retrofit2.Response<Response>>
 }

@@ -5,28 +5,38 @@ import com.jabezmagomere.movies.data.db.MoviesDao
 import com.jabezmagomere.movies.data.db.Movie
 import com.jabezmagomere.movies.data.network.AppDataSource
 import com.jabezmagomere.movies.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 
-class MovieRepositoryImpl(private val appDataSource: AppDataSource, private val moviesDao: MoviesDao) : MovieRepository {
+class MovieRepositoryImpl(private val appDataSource: AppDataSource, private val moviesDao: MoviesDao) :
+    MovieRepository {
     override suspend fun getTrendingMoviesThisWeek(): LiveData<List<Movie>> {
-        if(moviesDao.getAllMovies(Constants.TRENDING_THIS_WEEK).value.isNullOrEmpty()){
+        if (moviesDao.getAllMovies(Constants.TRENDING_THIS_WEEK).value.isNullOrEmpty()) {
             val movieResponse = appDataSource.fetchTrendingMoviesThisWeek()
-            if(movieResponse.isSuccessful){
-                movieResponse.body()?.results?.forEach {movie->
-                    movie.category = Constants.TRENDING_THIS_WEEK
-                    moviesDao.insertMovie(movie)
+            movieResponse.collect { response ->
+                if (response.isSuccessful) {
+                    response.body()?.results?.forEach { movie ->
+                        movie.category = Constants.TRENDING_THIS_WEEK
+                        moviesDao.insertMovie(movie)
+                    }
                 }
+
             }
         }
         return moviesDao.getAllMovies(Constants.TRENDING_THIS_WEEK)
     }
 
     override suspend fun getTrendingMoviesToday(): LiveData<List<Movie>> {
-        if(moviesDao.getAllMovies(Constants.TRENDING_TODAY).value.isNullOrEmpty()){
+        if (moviesDao.getAllMovies(Constants.TRENDING_TODAY).value.isNullOrEmpty()) {
             val movieResponse = appDataSource.fetchTrendingMoviesToday()
-            if(movieResponse.isSuccessful){
-                movieResponse.body()?.results?.forEach {movie->
-                    movie.category = Constants.TRENDING_TODAY
-                    moviesDao.insertMovie(movie)
+            movieResponse.collect { response ->
+                if (response.isSuccessful) {
+                    response.body()?.results?.forEach { movie ->
+                        movie.category = Constants.TRENDING_TODAY
+                        moviesDao.insertMovie(movie)
+                    }
                 }
             }
         }
@@ -35,23 +45,27 @@ class MovieRepositoryImpl(private val appDataSource: AppDataSource, private val 
     }
 
     override suspend fun discoverActionMovies(): LiveData<List<Movie>> {
-            val movieResponse = appDataSource.fetchActionMovies()
-            if(movieResponse.isSuccessful){
-                movieResponse.body()?.results?.forEach {movie->
+        val movieResponse = appDataSource.fetchActionMovies()
+        movieResponse.collect { response ->
+            if (response.isSuccessful) {
+                response.body()?.results?.forEach { movie ->
                     movie.category = Constants.ACTION
                     moviesDao.insertMovie(movie)
                 }
             }
+        }
 
         return moviesDao.getAllMovies(Constants.ACTION)
     }
 
     override suspend fun discoverComedyMovies(): LiveData<List<Movie>> {
         val movieResponse = appDataSource.fetchComedyMovies()
-        if(movieResponse.isSuccessful){
-            movieResponse.body()?.results?.forEach {movie->
-                movie.category = Constants.COMEDY
-                moviesDao.insertMovie(movie)
+        movieResponse.collect { response ->
+            if (response.isSuccessful) {
+                response.body()?.results?.forEach { movie ->
+                    movie.category = Constants.COMEDY
+                    moviesDao.insertMovie(movie)
+                }
             }
         }
 
