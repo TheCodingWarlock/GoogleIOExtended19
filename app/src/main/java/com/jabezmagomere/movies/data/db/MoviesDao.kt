@@ -6,7 +6,7 @@ import androidx.room.*
 @Dao
 interface MoviesDao {
     @Query("SELECT * FROM Movies WHERE category=:category")
-    fun getAllMovies(category:String):LiveData<List<Movie>>
+    fun getAllMovies(category:String):List<Movie>
 
     @Query("DELETE FROM Movies")
     suspend fun clearMovies()

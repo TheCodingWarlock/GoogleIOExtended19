@@ -15,10 +15,10 @@ import retrofit2.http.GET
 interface MoviesApiService {
 
     @GET("trending/movie/week")
-    suspend fun fetchTrendingMoviesThisWeek():Flow<retrofit2.Response<Response>>
+    fun fetchTrendingMoviesThisWeek():Flow<retrofit2.Response<Response>>
 
     @GET("trending/movie/day")
-    suspend fun fetchTrendingMoviesToday():Flow<retrofit2.Response<Response>>
+    fun fetchTrendingMoviesToday():Flow<retrofit2.Response<Response>>
 
     companion object {
         operator fun invoke(authenticationInterceptor: AuthenticationInterceptor, connectivityInterceptor: ConnectivityInterceptor): MoviesApiService {

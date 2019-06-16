@@ -15,10 +15,10 @@ import retrofit2.http.GET
 interface DiscoverMoviesApiService {
 
     @GET("discover/movie?with_genres=28&sort_by=vote_average.desc&vote_count.gte=10")
-    suspend fun fetchActionMovies():Flow<retrofit2.Response<Response>>
+    fun fetchActionMovies():Flow<retrofit2.Response<Response>>
 
     @GET("discover/movie?with_genres=35&sort_by=vote_average.desc&vote_count.gte=10")
-    suspend fun fetchComedyMovies():Flow<retrofit2.Response<Response>>
+    fun fetchComedyMovies():Flow<retrofit2.Response<Response>>
 
     companion object {
         operator fun invoke(discoverAuthenticatorInterceptor: DiscoverAuthenticatorInterceptor, connectivityInterceptor: ConnectivityInterceptor): DiscoverMoviesApiService {

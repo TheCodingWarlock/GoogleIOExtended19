@@ -1,75 +1,65 @@
 package com.jabezmagomere.movies.data.repository
 
-import androidx.lifecycle.LiveData
 import com.jabezmagomere.movies.data.db.MoviesDao
 import com.jabezmagomere.movies.data.db.Movie
 import com.jabezmagomere.movies.data.network.AppDataSource
 import com.jabezmagomere.movies.util.Constants
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 class MovieRepositoryImpl(private val appDataSource: AppDataSource, private val moviesDao: MoviesDao) :
     MovieRepository {
-    override suspend fun getTrendingMoviesThisWeek(): LiveData<List<Movie>> {
-        if (moviesDao.getAllMovies(Constants.TRENDING_THIS_WEEK).value.isNullOrEmpty()) {
-            val movieResponse = appDataSource.fetchTrendingMoviesThisWeek()
-            movieResponse.collect { response ->
-                if (response.isSuccessful) {
-                    response.body()?.results?.forEach { movie ->
-                        movie.category = Constants.TRENDING_THIS_WEEK
-                        moviesDao.insertMovie(movie)
-                    }
+    override fun getTrendingMoviesThisWeek(): Flow<List<Movie>> {
+        return appDataSource.fetchTrendingMoviesThisWeek()
+            .map { response ->
+                val movies = response.body()!!.results
+                for (movie in movies) {
+                    movie.category = Constants.TRENDING_THIS_WEEK
+                    moviesDao.insertMovie(movie)
                 }
-
-            }
-        }
-        return moviesDao.getAllMovies(Constants.TRENDING_THIS_WEEK)
+                movies
+            }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getTrendingMoviesToday(): LiveData<List<Movie>> {
-        if (moviesDao.getAllMovies(Constants.TRENDING_TODAY).value.isNullOrEmpty()) {
-            val movieResponse = appDataSource.fetchTrendingMoviesToday()
-            movieResponse.collect { response ->
-                if (response.isSuccessful) {
-                    response.body()?.results?.forEach { movie ->
-                        movie.category = Constants.TRENDING_TODAY
-                        moviesDao.insertMovie(movie)
-                    }
+    override fun getTrendingMoviesToday(): Flow<List<Movie>> {
+        return appDataSource.fetchTrendingMoviesToday()
+            .map { response ->
+                val movies = response.body()!!.results
+                for (movie in movies) {
+                    movie.category = Constants.TRENDING_TODAY
+                    moviesDao.insertMovie(movie)
                 }
-            }
-        }
-        return moviesDao.getAllMovies(Constants.TRENDING_TODAY)
-
+                movies
+            }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun discoverActionMovies(): LiveData<List<Movie>> {
-        val movieResponse = appDataSource.fetchActionMovies()
-        movieResponse.collect { response ->
-            if (response.isSuccessful) {
-                response.body()?.results?.forEach { movie ->
+    override fun discoverActionMovies(): Flow<List<Movie>> {
+        return appDataSource.fetchActionMovies()
+            .map { response ->
+                val movies = response.body()!!.results
+                for (movie in movies) {
                     movie.category = Constants.ACTION
                     moviesDao.insertMovie(movie)
                 }
+                movies
             }
-        }
-
-        return moviesDao.getAllMovies(Constants.ACTION)
+            .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun discoverComedyMovies(): LiveData<List<Movie>> {
-        val movieResponse = appDataSource.fetchComedyMovies()
-        movieResponse.collect { response ->
-            if (response.isSuccessful) {
-                response.body()?.results?.forEach { movie ->
-                    movie.category = Constants.COMEDY
+    override fun discoverComedyMovies(): Flow<List<Movie>> {
+        return appDataSource.fetchComedyMovies()
+            .map { response ->
+                val movies = response.body()!!.results
+                for (movie in movies) {
+                    movie.category = Constants.ACTION
                     moviesDao.insertMovie(movie)
                 }
+                movies
             }
-        }
-
-        return moviesDao.getAllMovies(Constants.COMEDY)
+            .flowOn(Dispatchers.IO)
     }
 
 

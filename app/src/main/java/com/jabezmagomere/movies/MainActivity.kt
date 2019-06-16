@@ -25,6 +25,11 @@ import com.jabezmagomere.movies.ui.viewmodel.MainActivityViewModelFactory
 import com.jabezmagomere.movies.util.Constants
 import com.jabezmagomere.movies.util.CustomOnClickListener
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -35,6 +40,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private val mainActivityViewModelFactory by instance<MainActivityViewModelFactory>()
     private lateinit var mainActivityViewModel: MainAcitvityViewModel
     private val categories = ArrayList<Category>()
+    private val scope = MainScope()
+
     companion object {
         const val MOVIE_TITLE = "movie_title"
         const val MOVIE_BUNDLE = "movie_data"
@@ -43,13 +50,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         const val MOVIE_BACKDROP = "movie_backdrop"
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if(categories.size>0)categories.clear()
+        if (categories.size > 0) categories.clear()
         mainActivityViewModel = ViewModelProviders.of(this, mainActivityViewModelFactory)
-                .get(MainAcitvityViewModel::class.java)
+            .get(MainAcitvityViewModel::class.java)
 //        setProgress()
         getTrendingMoviesToday()
         getTrendingMoviesThisWeek()
@@ -58,29 +64,31 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         displayData()
     }
 
-    private fun displayData(){
-        mainActivityViewModel.allCategory.observe(this, Observer {categories->
+    private fun displayData() {
+        mainActivityViewModel.allCategory.observe(this, Observer { categories ->
             setupRecyclerView(categories)
         })
-
     }
+
     private fun getTrendingMoviesThisWeek() {
-        mainActivityViewModel.trendingMoviesThisWeek.observe(this, Observer { movies->
-            if(!movies.isNullOrEmpty()){
-                displayTrendingMoviesThisWeek(movies)
-                categories.add(Category("Trending this week",movies))
-                mainActivityViewModel.allCategory.postValue(categories)
+        scope.launch {
+            mainActivityViewModel.trendingMoviesThisWeek.collect { movies ->
+                if (!movies.isNullOrEmpty()) {
+                    displayTrendingMoviesThisWeek(movies)
+                    categories.add(Category("Trending this week", movies))
+                    mainActivityViewModel.allCategory.postValue(categories)
+                }
             }
-        })
+        }
     }
 
     private fun displayTrendingMoviesThisWeek(movies: List<Movie>) {
         val imageList = ArrayList<SlideModel>()
-        movies.forEach {movie->
-            imageList.add(SlideModel("${Constants.IMAGE_URL}${movie.backdropPath}",movie.title))
+        movies.forEach { movie ->
+            imageList.add(SlideModel("${Constants.IMAGE_URL}${movie.backdropPath}", movie.title))
         }
         imageSlider.setImageList(imageList)
-        imageSlider.setItemClickListener(object :ItemClickListener{
+        imageSlider.setItemClickListener(object : ItemClickListener {
             override fun onItemSelected(position: Int) {
                 val movieItem = imageList[position]
                 Toast.makeText(this@MainActivity, movieItem.title, Toast.LENGTH_SHORT).show()
@@ -90,48 +98,56 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     }
 
-    private fun getTrendingMoviesToday(){
-        mainActivityViewModel.trendingMoviesToday.observe(this, Observer {movies->
-            if(!movies.isNullOrEmpty()){
-                categories.add(Category("Trending Movies Today",movies))
-                mainActivityViewModel.allCategory.postValue(categories)
+    private fun getTrendingMoviesToday() {
+        scope.launch {
+            mainActivityViewModel.trendingMoviesToday.collect { movies ->
+                if (!movies.isNullOrEmpty()) {
+                    categories.add(Category("Trending Movies Today", movies))
+                    mainActivityViewModel.allCategory.postValue(categories)
+                }
             }
-        })
+        }
     }
 
-    private fun discoverActionMovies(){
-        mainActivityViewModel.actionMovies.observe(this, Observer {movies->
-            if(!movies.isNullOrEmpty()){
-                categories.add(Category("Action Movies",movies))
-                mainActivityViewModel.allCategory.postValue(categories)
+    private fun discoverActionMovies() {
+        scope.launch {
+            mainActivityViewModel.actionMovies.collect { movies ->
+                if (!movies.isNullOrEmpty()) {
+                    categories.add(Category("Action Movies", movies))
+                    mainActivityViewModel.allCategory.postValue(categories)
+                }
             }
-        })
+        }
     }
 
-    private fun discoverComedyMovies(){
-        mainActivityViewModel.comedyMovies.observe(this, Observer {movies->
-            if(!movies.isNullOrEmpty()){
-                categories.add(Category("Comedy Movies",movies))
-                mainActivityViewModel.allCategory.postValue(categories)
+    private fun discoverComedyMovies() {
+        scope.launch {
+            mainActivityViewModel.comedyMovies.collect { movies ->
+                if (!movies.isNullOrEmpty()) {
+                    categories.add(Category("Comedy Movies", movies))
+                    mainActivityViewModel.allCategory.postValue(categories)
+                }
             }
-        })
+        }
     }
 
 
-    private fun setupRecyclerView(categories:ArrayList<Category>){
-        if(categories.size>0){
+    private fun setupRecyclerView(categories: ArrayList<Category>) {
+        if (categories.size > 0) {
             recyclerView.apply {
-                layoutManager = LinearLayoutManager(this@MainActivity,
-                    RecyclerView.VERTICAL, false)
-                adapter = CategoryRecyclerViewAdapter(categories, object : CustomOnClickListener{
+                layoutManager = LinearLayoutManager(
+                    this@MainActivity,
+                    RecyclerView.VERTICAL, false
+                )
+                adapter = CategoryRecyclerViewAdapter(categories, object : CustomOnClickListener {
                     override fun onItemClick(movie: Movie) {
                         val bundle = Bundle()
-                        bundle.putString(MOVIE_TITLE,movie.title)
+                        bundle.putString(MOVIE_TITLE, movie.title)
                         bundle.putString(MOVIE_BACKDROP, movie.backdropPath)
-                        bundle.putString(MOVIE_OVERVIEW,movie.overview)
-                        bundle.putString(MOVIE_POSTER,movie.posterPath)
+                        bundle.putString(MOVIE_OVERVIEW, movie.overview)
+                        bundle.putString(MOVIE_POSTER, movie.posterPath)
                         val intent = Intent(this@MainActivity, MovieDetailActivity::class.java)
-                        intent.putExtra(MOVIE_BUNDLE,bundle)
+                        intent.putExtra(MOVIE_BUNDLE, bundle)
                         startActivity(intent)
                     }
 
@@ -151,5 +167,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 //            }
 //        })
 //    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
+    }
 
 }
