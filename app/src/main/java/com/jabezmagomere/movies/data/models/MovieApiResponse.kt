@@ -3,7 +3,7 @@ package com.jabezmagomere.movies.data.models
 import com.google.gson.annotations.SerializedName
 import com.jabezmagomere.movies.data.db.Movie
 
-data class Response(
+data class MovieApiResponse(
     val page: Int, // 1
     val results: List<Movie>,
     @SerializedName("total_pages")

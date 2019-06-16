@@ -1,7 +1,5 @@
 package com.jabezmagomere.movies.data.network
 
-import com.jabezmagomere.movies.data.db.Movie
-import com.jabezmagomere.movies.data.models.Response
 import com.jabezmagomere.movies.data.network.Api.DiscoverMoviesApiService
 import com.jabezmagomere.movies.data.network.Api.MoviesApiService
 

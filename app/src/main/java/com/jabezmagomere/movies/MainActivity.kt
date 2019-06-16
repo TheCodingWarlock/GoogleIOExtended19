@@ -2,30 +2,23 @@ package com.jabezmagomere.movies
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.denzcoskun.imageslider.interfaces.ItemClickListener
 import com.denzcoskun.imageslider.models.SlideModel
-import com.google.android.material.snackbar.Snackbar
 import com.jabezmagomere.movies.data.db.Movie
 import com.jabezmagomere.movies.ui.MovieDetailActivity
 import com.jabezmagomere.movies.ui.adapters.CategoryRecyclerViewAdapter
 import com.jabezmagomere.movies.ui.view.Category
-import com.jabezmagomere.movies.ui.viewmodel.MainAcitvityViewModel
+import com.jabezmagomere.movies.ui.viewmodel.MainActivityViewModel
 import com.jabezmagomere.movies.ui.viewmodel.MainActivityViewModelFactory
 import com.jabezmagomere.movies.util.Constants
 import com.jabezmagomere.movies.util.CustomOnClickListener
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
@@ -38,7 +31,7 @@ import org.kodein.di.generic.instance
 class MainActivity : AppCompatActivity(), KodeinAware {
     override val kodein: Kodein by closestKodein()
     private val mainActivityViewModelFactory by instance<MainActivityViewModelFactory>()
-    private lateinit var mainActivityViewModel: MainAcitvityViewModel
+    private lateinit var mainActivityViewModel: MainActivityViewModel
     private val categories = ArrayList<Category>()
     private val scope = MainScope()
 
@@ -55,7 +48,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         setContentView(R.layout.activity_main)
         if (categories.size > 0) categories.clear()
         mainActivityViewModel = ViewModelProviders.of(this, mainActivityViewModelFactory)
-            .get(MainAcitvityViewModel::class.java)
+            .get(MainActivityViewModel::class.java)
 //        setProgress()
         getTrendingMoviesToday()
         getTrendingMoviesThisWeek()

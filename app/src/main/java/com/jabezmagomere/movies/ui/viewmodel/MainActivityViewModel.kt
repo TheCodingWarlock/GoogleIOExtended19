@@ -11,7 +11,7 @@ import com.jabezmagomere.movies.ui.view.Category
 import kotlinx.coroutines.*
 import java.lang.Exception
 
-class MainAcitvityViewModel(private val movieRepository: MovieRepository) : ViewModel() {
+class MainActivityViewModel(movieRepository: MovieRepository) : ViewModel() {
 
     val trendingMoviesToday = movieRepository.getTrendingMoviesThisWeek()
 
