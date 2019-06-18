@@ -7,8 +7,8 @@ class AppDataSourceImpl(
     private val moviesApiService: MoviesApiService,
     private val discoverMoviesApiService: DiscoverMoviesApiService
 ) : AppDataSource {
-    override fun fetchActionMovies() = discoverMoviesApiService.fetchActionMovies()
-    override fun fetchComedyMovies() = discoverMoviesApiService.fetchComedyMovies()
-    override fun fetchTrendingMoviesThisWeek() = moviesApiService.fetchTrendingMoviesThisWeek()
-    override fun fetchTrendingMoviesToday() = moviesApiService.fetchTrendingMoviesToday()
+    override suspend fun fetchActionMovies() = discoverMoviesApiService.fetchActionMovies()
+    override suspend fun fetchComedyMovies() = discoverMoviesApiService.fetchComedyMovies()
+    override suspend fun fetchTrendingMoviesThisWeek() = moviesApiService.fetchTrendingMoviesThisWeek()
+    override suspend fun fetchTrendingMoviesToday() = moviesApiService.fetchTrendingMoviesToday()
 }

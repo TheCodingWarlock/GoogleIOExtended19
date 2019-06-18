@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     private fun getTrendingMoviesThisWeek() {
         scope.launch {
+            mainActivityViewModel.initTrendingMoviesThisWeek()
             mainActivityViewModel.trendingMoviesThisWeek.collect { movies ->
                 if (!movies.isNullOrEmpty()) {
                     displayTrendingMoviesThisWeek(movies)
@@ -93,6 +94,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     private fun getTrendingMoviesToday() {
         scope.launch {
+            mainActivityViewModel.initTrendingMoviesToday()
             mainActivityViewModel.trendingMoviesToday.collect { movies ->
                 if (!movies.isNullOrEmpty()) {
                     categories.add(Category("Trending Movies Today", movies))
@@ -104,6 +106,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     private fun discoverActionMovies() {
         scope.launch {
+            mainActivityViewModel.initActionMovies()
             mainActivityViewModel.actionMovies.collect { movies ->
                 if (!movies.isNullOrEmpty()) {
                     categories.add(Category("Action Movies", movies))
@@ -115,6 +118,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     private fun discoverComedyMovies() {
         scope.launch {
+            mainActivityViewModel.initComedyMovies()
             mainActivityViewModel.comedyMovies.collect { movies ->
                 if (!movies.isNullOrEmpty()) {
                     categories.add(Category("Comedy Movies", movies))
